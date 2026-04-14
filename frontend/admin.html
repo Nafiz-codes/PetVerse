@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — PetVerse</title>
+  <meta name="description" content="Admin moderation panel for PetVerse animal adoption platform." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">🐾 PetVerse</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-link active" data-page="overview" id="navOverview">
+        <span class="nav-icon">📊</span> Overview
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Moderation</div>
+      <button class="nav-link" data-page="allposts" id="navAllPosts">
+        <span class="nav-icon">📝</span> All Posts
+      </button>
+      <button class="nav-link" data-page="adoptionAdmin" id="navAdoptionAdmin">
+        <span class="nav-icon">🐾</span> Adoptions
+      </button>
+      <button class="nav-link" data-page="buysellAdmin" id="navBuySellAdmin">
+        <span class="nav-icon">🛒</span> Buy / Sell
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Donations</div>
+      <button class="nav-link" data-page="donationsAdmin" id="navDonAdmin">
+        <span class="nav-icon">💝</span> Campaigns
+      </button>
+      <button class="nav-link" data-page="createCampaign" id="navCreateCamp">
+        <span class="nav-icon">➕</span> New Campaign
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="sidebarAvatar">A</div>
+        <div class="user-info">
+          <div class="name" id="sidebarName">Admin</div>
+          <div class="role" id="sidebarRole">admin</div>
+        </div>
+        <button class="btn-logout" title="Logout" onclick="logout()">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title" id="topbarTitle">Admin Overview</span>
+      <div class="topbar-actions">
+        <span class="badge badge-red" style="padding:6px 14px;font-size:0.8rem;">⚡ Admin Mode</span>
+      </div>
+    </header>
+
+    <!-- Overview Page -->
+    <section class="page active" id="page-overview">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value" id="statPosts">…</div><div class="stat-label">Total Posts</div></div>
+        <div class="stat-card"><div class="stat-icon">🐾</div><div class="stat-value" id="statAdoptions">…</div><div class="stat-label">Adoptions</div></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-value" id="statUsers">…</div><div class="stat-label">Users</div></div>
+        <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statModerated">…</div><div class="stat-label">Moderated</div></div>
+        <div class="stat-card"><div class="stat-icon">🗑️</div><div class="stat-value" id="statDeleted">…</div><div class="stat-label">Deleted</div></div>
+        <div class="stat-card"><div class="stat-icon">💝</div><div class="stat-value" id="statCollected">…</div><div class="stat-label">Donations Collected</div></div>
+      </div>
+
+      <div class="section-header" style="margin-top:8px;">
+        <h2 class="section-title">Recent <span>Posts</span></h2>
+      </div>
+      <div class="posts-grid" id="recentPostsGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- All Posts Page -->
+    <section class="page" id="page-allposts">
+      <div class="section-header">
+        <h2 class="section-title">All <span>Posts</span></h2>
+        <div class="filter-bar" style="margin-bottom:0;">
+          <button class="filter-pill active" data-type="">All</button>
+          <button class="filter-pill" data-type="Adoption">Adoptions</button>
+          <button class="filter-pill" data-type="BuySell">Buy/Sell</button>
+        </div>
+      </div>
+      <div class="table-wrap" style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Author</th><th>Type</th><th>Details</th><th>Date</th><th>Status</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="allPostsBody">
+            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Adoptions Admin Page -->
+    <section class="page" id="page-adoptionAdmin">
+      <div class="section-header">
+        <h2 class="section-title">🐾 <span>Adoption Posts</span></h2>
+        <select class="filter-select" id="adminAnimalFilter">
+          <option value="">All Animal Types</option>
+        </select>
+      </div>
+      <div class="posts-grid" id="adminAdoptionsGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Buy/Sell Admin Page -->
+    <section class="page" id="page-buysellAdmin">
+      <div class="section-header">
+        <h2 class="section-title">🛒 <span>Buy/Sell Posts</span></h2>
+      </div>
+      <div class="posts-grid" id="adminBuySellGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Donations Admin Page -->
+    <section class="page" id="page-donationsAdmin">
+      <div class="section-header">
+        <h2 class="section-title">💝 <span>Donation Campaigns</span></h2>
+        <button class="btn btn-primary btn-sm" onclick="showAdminPage('createCampaign')">+ New Campaign</button>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="adminDonAnimalFilter">
+          <option value="">All Animal Types</option>
+        </select>
+      </div>
+      <div class="donations-grid" id="adminDonationsGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Create Campaign Page -->
+    <section class="page" id="page-createCampaign">
+      <div class="section-header">
+        <h2 class="section-title">➕ <span>New Campaign</span></h2>
+      </div>
+      <div style="max-width:560px;">
+        <div id="campAlert" class="alert alert-error"></div>
+        <div id="campSuccess" class="alert alert-success"></div>
+        <form id="createCampaignForm">
+          <div class="form-group">
+            <label for="campTitle">Campaign Title</label>
+            <input id="campTitle" type="text" class="form-control" placeholder="e.g. Save Street Cats" required />
+          </div>
+          <div class="form-group">
+            <label for="campDesc">Description</label>
+            <textarea id="campDesc" class="form-control" rows="3" placeholder="What is this campaign for?" style="resize:vertical;"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="campStart">Start Date</label>
+              <input id="campStart" type="date" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label for="campEnd">End Date</label>
+              <input id="campEnd" type="date" class="form-control" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="campTarget">Target Amount ($)</label>
+              <input id="campTarget" type="number" class="form-control" placeholder="e.g. 5000" min="1" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label for="campAnimalType">Animal Type (optional)</label>
+              <select id="campAnimalType" class="form-control">
+                <option value="">None (General)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:20px;">
+            <button type="submit" class="btn btn-primary btn-lg" id="createCampBtn">
+              🚀 Launch Campaign
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Moderate Modal -->
+<div class="modal-backdrop" id="moderateModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">✅ Moderate Post</h3>
+      <button class="btn-close" onclick="closeModal('moderateModal')">✕</button>
+    </div>
+    <div class="form-group">
+      <label for="modNotes">Moderation Notes (optional)</label>
+      <textarea id="modNotes" class="form-control" rows="3" placeholder="Any notes about this moderation…"></textarea>
+    </div>
+    <input type="hidden" id="modPostId" />
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-success btn-full" id="confirmModBtn">✅ Confirm Moderate</button>
+      <button class="btn btn-secondary" onclick="closeModal('moderateModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" style="color:var(--danger);">🗑️ Delete Post</h3>
+      <button class="btn-close" onclick="closeModal('deleteModal')">✕</button>
+    </div>
+    <p style="color:var(--text-secondary);margin-bottom:20px;">
+      Are you sure you want to delete this post? This action cannot be undone.<br/>
+      <small style="color:var(--text-muted);">Orphan animal types will be automatically removed.</small>
+    </p>
+    <input type="hidden" id="delPostId" />
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-danger btn-full" id="confirmDelBtn">🗑️ Delete Post</button>
+      <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/auth.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

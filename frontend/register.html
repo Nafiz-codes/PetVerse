@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — PetVerse</title>
+  <meta name="description" content="Create your PetVerse account to adopt animals or help manage the platform." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="auth-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="auth-card" style="max-width:520px;">
+    <div class="auth-logo">
+      <span class="logo-icon">🐾</span>
+      <h1>PetVerse</h1>
+      <p>Create your account</p>
+    </div>
+
+    <div id="regAlert" class="alert alert-error"></div>
+    <div id="regSuccess" class="alert alert-success"></div>
+
+    <form id="registerForm" autocomplete="off">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input id="regName" type="text" class="form-control" placeholder="John Doe" required />
+        </div>
+        <div class="form-group">
+          <label for="regRole">Account Type</label>
+          <select id="regRole" class="form-control" required>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="regEmail">Email Address</label>
+        <input id="regEmail" type="email" class="form-control" placeholder="you@example.com" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="regMobile">Mobile</label>
+          <input id="regMobile" type="tel" class="form-control" placeholder="01700000000" />
+        </div>
+        <div class="form-group">
+          <label for="regDob">Date of Birth</label>
+          <input id="regDob" type="date" class="form-control" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="regPassword">Password</label>
+        <input id="regPassword" type="password" class="form-control" placeholder="Min. 6 characters" required minlength="6" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="regBtn">
+        Create Account
+      </button>
+    </form>
+
+    <div class="auth-link">
+      Already have an account? <a href="/">Sign in →</a>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/auth.js"></script>
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn      = document.getElementById('regBtn');
+    const alertEl  = document.getElementById('regAlert');
+    const successEl= document.getElementById('regSuccess');
+    alertEl.classList.remove('show');
+    successEl.classList.remove('show');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Creating account…';
+
+    try {
+      const res  = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:          document.getElementById('regName').value,
+          email:         document.getElementById('regEmail').value,
+          mobile:        document.getElementById('regMobile').value,
+          date_of_birth: document.getElementById('regDob').value || undefined,
+          password:      document.getElementById('regPassword').value,
+          role:          document.getElementById('regRole').value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({
+        account_id: data.account_id, name: data.name,
+        email: data.email, role: data.role, balance: data.balance
+      }));
+
+      successEl.textContent = 'Account created! Redirecting…';
+      successEl.classList.add('show');
+
+      setTimeout(() => {
+        window.location.href = data.role === 'admin' ? '/admin.html' : '/dashboard.html';
+      }, 1200);
+    } catch (err) {
+      alertEl.textContent = err.message;
+      alertEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  });
+</script>
+</body>
+</html>

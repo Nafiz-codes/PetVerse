@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — PetVerse</title>
+  <meta name="description" content="Browse and filter animal adoption and buy/sell posts on PetVerse." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">🐾 PetVerse</div>
+      <div class="logo-sub">User Dashboard</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Browse</div>
+      <button class="nav-link active" data-page="feed" id="navFeed">
+        <span class="nav-icon">🏠</span> Feed
+      </button>
+      <button class="nav-link" data-page="adoptions" id="navAdoptions">
+        <span class="nav-icon">🐶</span> Adoptions
+      </button>
+      <button class="nav-link" data-page="buysell" id="navBuySell">
+        <span class="nav-icon">🛒</span> Buy / Sell
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Actions</div>
+      <button class="nav-link" data-page="create" id="navCreate">
+        <span class="nav-icon">✍️</span> Create Post
+      </button>
+      <button class="nav-link" data-page="donations" id="navDonations">
+        <span class="nav-icon">💝</span> Donations
+      </button>
+      <button class="nav-link" data-page="transactions" id="navTransactions">
+        <span class="nav-icon">📋</span> My Transactions
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <div class="name" id="sidebarName">Loading…</div>
+          <div class="role" id="sidebarRole">user</div>
+        </div>
+        <button class="btn-logout" title="Logout" onclick="logout()">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title" id="topbarTitle">Feed</span>
+      <div class="topbar-actions">
+        <span class="balance-chip" id="balanceChip">💰 $0.00</span>
+        <button class="btn btn-primary btn-sm" onclick="showPage('create')">+ New Post</button>
+      </div>
+    </header>
+
+    <!-- Feed Page -->
+    <section class="page active" id="page-feed">
+      <div class="filter-bar" id="feedFilterBar">
+        <button class="filter-pill active" data-type="" id="filterAll">All Posts</button>
+        <button class="filter-pill" data-type="Adoption" id="filterAdoption">🐾 Adoptions</button>
+        <button class="filter-pill" data-type="BuySell" id="filterBuySell">🛒 Buy/Sell</button>
+        <select class="filter-select" id="animalTypeFilter" style="display:none;">
+          <option value="">All Animals</option>
+        </select>
+      </div>
+      <div class="posts-grid" id="feedGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Adoptions Page -->
+    <section class="page" id="page-adoptions">
+      <div class="section-header">
+        <h2 class="section-title">🐾 <span>Adoption Posts</span></h2>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="adoptionAnimalFilter">
+          <option value="">All Animal Types</option>
+        </select>
+      </div>
+      <div class="posts-grid" id="adoptionsGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Buy/Sell Page -->
+    <section class="page" id="page-buysell">
+      <div class="section-header">
+        <h2 class="section-title">🛒 <span>Buy / Sell</span></h2>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-pill active" data-cat="">All</button>
+        <button class="filter-pill" data-cat="Medicine">💊 Medicine</button>
+        <button class="filter-pill" data-cat="Toys">🧸 Toys</button>
+      </div>
+      <div class="posts-grid" id="buysellGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- Create Post Page -->
+    <section class="page" id="page-create">
+      <div class="section-header">
+        <h2 class="section-title">✍️ <span>Create Post</span></h2>
+      </div>
+      <div style="max-width:600px;">
+        <div id="createAlert" class="alert alert-error"></div>
+        <div id="createSuccess" class="alert alert-success"></div>
+
+        <form id="createPostForm">
+          <div class="form-group">
+            <label for="postDescription">Description</label>
+            <textarea id="postDescription" class="form-control" rows="3" placeholder="Describe your post…" style="resize:vertical;" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="postType">Post Type</label>
+            <select id="postType" class="form-control" required>
+              <option value="">— Select type —</option>
+              <option value="Adoption">🐾 Adoption</option>
+              <option value="BuySell">🛒 Buy / Sell</option>
+            </select>
+          </div>
+
+          <!-- Adoption Section -->
+          <div id="adoptionSection" class="conditional-section" style="display:none;">
+            <div class="form-group">
+              <label for="animalTypeSelect">Animal Type</label>
+              <select id="animalTypeSelect" class="form-control">
+                <option value="">— Select existing type —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="newAnimalType">Or enter new animal type</label>
+              <input id="newAnimalType" type="text" class="form-control" placeholder="e.g. Hamster, Snake…" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="animalName">Animal Name</label>
+                <input id="animalName" type="text" class="form-control" placeholder="e.g. Whiskers" />
+              </div>
+              <div class="form-group">
+                <label for="animalGender">Gender</label>
+                <select id="animalGender" class="form-control">
+                  <option value="">Unknown</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="animalAge">Age (years)</label>
+                <input id="animalAge" type="number" class="form-control" placeholder="e.g. 2" min="0" />
+              </div>
+              <div class="form-group">
+                <label for="animalLocation">Location</label>
+                <input id="animalLocation" type="text" class="form-control" placeholder="e.g. Dhaka" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Buy/Sell Section -->
+          <div id="buysellSection" class="conditional-section" style="display:none;">
+            <div class="form-group">
+              <label for="bsCategory">Category</label>
+              <select id="bsCategory" class="form-control">
+                <option value="">— Select category —</option>
+                <option value="Medicine">💊 Medicine</option>
+                <option value="Toys">🧸 Toys</option>
+              </select>
+            </div>
+            <!-- Medicine extra -->
+            <div id="medicineSection" style="display:none;">
+              <div class="form-group">
+                <label for="expireDate">Expiry Date</label>
+                <input id="expireDate" type="date" class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <button type="submit" class="btn btn-primary btn-lg" id="createPostBtn">
+              🚀 Publish Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Donations Page -->
+    <section class="page" id="page-donations">
+      <div class="section-header">
+        <h2 class="section-title">💝 <span>Donation Campaigns</span></h2>
+      </div>
+      <div class="filter-bar">
+        <select class="filter-select" id="donAnimalFilter">
+          <option value="">All Animal Types</option>
+        </select>
+      </div>
+      <div class="donations-grid" id="donationsGrid">
+        <div class="empty-state"><div class="spinner"></div></div>
+      </div>
+    </section>
+
+    <!-- My Transactions Page -->
+    <section class="page" id="page-transactions">
+      <div class="section-header">
+        <h2 class="section-title">📋 <span>My Transactions</span></h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Campaign</th>
+              <th>Animal Type</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsBody">
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/auth.js"></script>
+<script src="/js/posts.js"></script>
+<script src="/js/create-post.js"></script>
+<script src="/js/donations.js"></script>
+</body>
+</html>
