@@ -1,0 +1,4 @@
+node_modules/
+.env
+mac_OS/
+.DS_Store
