@@ -1,6 +1,6 @@
 # 🐾 PetVerse — Animal Adoption Platform
 
-A full-stack, local-first web application designed to connect pets with loving homes and handle donations. Built natively without heavy frontend frameworks to maximize performance and portability.
+A full-stack, local-first web application designed to connect pets with loving homes and handle donations. Built natively without heavy frontend frameworks to maximize performance and portability. It is a group project for CSE370(Database) course in BRAC University. The group consists of 3 members: i.Me(Nafiz Shahriar Sami), ii.Eusha Kayenat, iii.Afnan Hafiz.
 
 ## Features
 - **Dynamic Post Creation**: Create adoption posts with dynamic animal categorization, or standard Buy/Sell offerings (e.g. Pet Toys, Medicine).
