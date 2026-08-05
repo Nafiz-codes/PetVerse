@@ -76,8 +76,16 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
     return;
   }
 
-  // Build payload
-  const payload = { post_type, description };
+  // Build payload using FormData
+  const formData = new FormData();
+  formData.append('post_type', post_type);
+  formData.append('description', description);
+
+  // Append image if selected
+  const fileInput = document.getElementById('postImage');
+  if (fileInput && fileInput.files.length > 0) {
+    formData.append('image', fileInput.files[0]);
+  }
 
   if (post_type === 'Adoption') {
     // Determine animal type name
@@ -92,11 +100,11 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
       alertEl.classList.add('show');
       return;
     }
-    payload.animal_type_name = animal_type_name;
-    payload.animal_name      = document.getElementById('animalName').value.trim()    || undefined;
-    payload.gender           = document.getElementById('animalGender').value         || undefined;
-    payload.age              = document.getElementById('animalAge').value            || undefined;
-    payload.location         = document.getElementById('animalLocation').value.trim()|| undefined;
+    formData.append('animal_type_name', animal_type_name);
+    if (document.getElementById('animalName').value.trim()) formData.append('animal_name', document.getElementById('animalName').value.trim());
+    if (document.getElementById('animalGender').value) formData.append('gender', document.getElementById('animalGender').value);
+    if (document.getElementById('animalAge').value) formData.append('age', document.getElementById('animalAge').value);
+    if (document.getElementById('animalLocation').value.trim()) formData.append('location', document.getElementById('animalLocation').value.trim());
   }
 
   if (post_type === 'BuySell') {
@@ -106,18 +114,21 @@ document.getElementById('createPostForm').addEventListener('submit', async (e) =
       alertEl.classList.add('show');
       return;
     }
-    payload.category    = category;
-    payload.expire_date = document.getElementById('expireDate').value || undefined;
+    formData.append('category', category);
+    if (document.getElementById('expireDate').value) formData.append('expire_date', document.getElementById('expireDate').value);
   }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Publishing…';
 
   try {
+    const headers = authHeaders();
+    delete headers['Content-Type']; // Let browser set multipart/form-data with boundary
+
     const res  = await fetch('/api/posts', {
       method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(payload),
+      headers: headers,
+      body: formData,
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to create post');

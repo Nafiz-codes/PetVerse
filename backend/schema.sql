@@ -67,7 +67,6 @@ CREATE TABLE Posts (
     description TEXT,
     post_date   DATE NOT NULL,
     post_type   VARCHAR(20) NOT NULL COMMENT 'Adoption or BuySell',
-    image_url   VARCHAR(255),
     FOREIGN KEY (account_id) REFERENCES Accounts(account_id)
 );
 

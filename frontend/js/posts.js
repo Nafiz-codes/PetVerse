@@ -81,11 +81,14 @@ function renderPostCard(p, isAdmin = false) {
        </div>`
     : '';
 
+  const imageSection = p.image_url ? `<div class="post-image-container" style="margin-top: 12px; margin-bottom: 12px;"><img src="${p.image_url}" class="post-image" alt="Post image" style="max-width: 100%; border-radius: 8px;" /></div>` : '';
+
   card.innerHTML = `
     ${typeBadge}${modBadge}
     ${topSection}
     <div class="post-card-body">
       <p class="post-title">${p.description || 'No description'}</p>
+      ${imageSection}
       ${metaItems ? `<div class="post-meta">${metaItems}</div>` : ''}
       <div class="post-author">
         <span>👤 ${p.author_name || 'Unknown'}</span>

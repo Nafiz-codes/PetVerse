@@ -1,6 +1,18 @@
 const router = require('express').Router();
 const pool   = require('../db');
 const { authenticate, requireUser } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '..', '..', 'frontend', 'uploads'))
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
+  }
+});
+const upload = multer({ storage: storage });
 
 // ─── Helper: ensure animal type exists (insert if new), return its ID ──────────
 async function ensureAnimalType(conn, animalTypeName) {
@@ -117,8 +129,9 @@ router.get('/', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/posts — create a new post (authenticated users only)
 // ─────────────────────────────────────────────────────────────────────────────
-router.post('/', authenticate, async (req, res) => {
-  const { post_type, description, image_url } = req.body;
+router.post('/', authenticate, upload.single('image'), async (req, res) => {
+  const { post_type, description } = req.body;
+  const image_url = req.file ? '/uploads/' + req.file.filename : null;
 
   if (!post_type || !['Adoption', 'BuySell'].includes(post_type)) {
     return res.status(400).json({ message: 'post_type must be Adoption or BuySell' });
@@ -133,7 +146,7 @@ router.post('/', authenticate, async (req, res) => {
     // Insert base Post
     const [postResult] = await conn.query(
       'INSERT INTO Posts (account_id, description, post_date, post_type, image_url) VALUES (?, ?, ?, ?, ?)',
-      [req.user.account_id, description || null, today, post_type, image_url || null]
+      [req.user.account_id, description || null, today, post_type, image_url]
     );
     const post_id = postResult.insertId;
 
